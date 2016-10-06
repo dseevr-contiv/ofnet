@@ -125,11 +125,9 @@ const (
 )
 
 // Create a new Ofnet agent and initialize it
-/*  routerInfo[0] -> Uplink nexthop interface
- */
 func NewOfnetAgent(bridgeName string, dpName string, localIp net.IP, rpcPort uint16,
-	ovsPort uint16, routerInfo ...string) (*OfnetAgent, error) {
-	log.Infof("Creating new ofnet agent for %s,%s,%d,%d,%d,%v \n", bridgeName, dpName, localIp, rpcPort, ovsPort, routerInfo)
+	ovsPort uint16, vlanIntf []string) (*OfnetAgent, error) {
+	log.Infof("Creating new ofnet agent for %s,%s,%d,%d,%d,%v \n", bridgeName, dpName, localIp, rpcPort, ovsPort, vlanIntf)
 	agent := new(OfnetAgent)
 
 	// Init params
@@ -188,7 +186,7 @@ func NewOfnetAgent(bridgeName string, dpName string, localIp net.IP, rpcPort uin
 		agent.datapath = NewVlrouter(agent, rpcServ)
 		agent.fwdMode = "routing"
 		agent.ovsDriver = ovsdbDriver.NewOvsDriver(bridgeName)
-		agent.protopath = NewOfnetBgp(agent, routerInfo)
+		agent.protopath = NewOfnetBgp(agent, vlanIntf)
 	default:
 		log.Fatalf("Unknown Datapath %s", dpName)
 	}
