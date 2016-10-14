@@ -67,10 +67,10 @@ type OfnetDatapath interface {
 	RemoveVlan(vlanId uint16, vni uint32, vrf string) error
 
 	//Add uplink port
-	AddUplink(portNo uint32, ifname string) error
+	AddUplink(uplinkInfo PortInfo) error
 
 	//Delete uplink port
-	RemoveUplink(portNo uint32) error
+	RemoveUplink(uplinkName string) error
 
 	//Inject GARPs
 	InjectGARPs(epgID int)
@@ -232,4 +232,28 @@ type OfnetEndpointStats struct {
 	VrfName    string                   // vrf name
 	PortStats  OfnetDatapathStats       // Aggregate port stats
 	SvcStats   map[string]OfnetSvcStats // Service level stats
+}
+
+type linkStatus int
+
+// LinkStatus maintains link up/down information
+const (
+	linkUp linkStatus = iota
+	linkDown
+)
+
+// InterfaceInfo maintains interface information
+type InterfaceInfo struct {
+	Name   string
+	Port   *PortInfo
+	Status linkStatus
+	OfPort uint32
+}
+
+// PortInfo maintains port information
+type PortInfo struct {
+	Name     string
+	Type     string
+	Status   linkStatus
+	IntfInfo []*InterfaceInfo
 }

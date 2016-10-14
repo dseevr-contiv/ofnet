@@ -956,38 +956,40 @@ func (self *Vlrouter) resolveUnresolvedEPs(MacAddrStr string, portNo uint32) {
 }
 
 // AddUplink adds an uplink to the switch
-func (self *Vlrouter) AddUplink(portNo uint32, ifname string) error {
-	log.Infof("Adding uplink port: %+v", portNo)
+func (self *Vlrouter) AddUplink(uplinkInfo PortInfo) error {
+	log.Infof("Adding uplink: %+v", uplinkInfo)
 
-	// Install a flow entry for vlan mapping and point it to Mac table
-	portVlanFlow, err := self.vlanTable.NewFlow(ofctrl.FlowMatch{
-		Priority:  FLOW_MATCH_PRIORITY,
-		InputPort: portNo,
-	})
-	if err != nil {
-		log.Errorf("Error creating portvlan entry. Err: %v", err)
-		if strings.Contains(err.Error(), "Flow already exists") {
-			return nil
+	for _, intf := range uplinkInfo.IntfInfo {
+		// Install a flow entry for vlan mapping and point it to Mac table
+		portVlanFlow, err := self.vlanTable.NewFlow(ofctrl.FlowMatch{
+			Priority:  FLOW_MATCH_PRIORITY,
+			InputPort: intf.OfPort,
+		})
+		if err != nil {
+			log.Errorf("Error creating portvlan entry. Err: %v", err)
+			if strings.Contains(err.Error(), "Flow already exists") {
+				return nil
+			}
+			return err
 		}
-		return err
-	}
 
-	// Packets coming from uplink go thru policy and iptable lookup
-	//FIXME: Change next to Policy table
-	sNATTbl := self.ofSwitch.GetTable(SRV_PROXY_SNAT_TBL_ID)
-	portVlanFlow.Next(sNATTbl)
-	if err != nil {
-		log.Errorf("Error installing portvlan entry. Err: %v", err)
-		return err
-	}
+		// Packets coming from uplink go thru policy and iptable lookup
+		//FIXME: Change next to Policy table
+		sNATTbl := self.ofSwitch.GetTable(SRV_PROXY_SNAT_TBL_ID)
+		portVlanFlow.Next(sNATTbl)
+		if err != nil {
+			log.Errorf("Error installing portvlan entry. Err: %v", err)
+			return err
+		}
 
-	// save the flow entry
-	self.portVlanFlowDb[portNo] = portVlanFlow
+		// save the flow entry
+		self.portVlanFlowDb[intf.OfPort] = portVlanFlow
+	}
 
 	return nil
 }
 
-func (self *Vlrouter) RemoveUplink(portNo uint32) error {
+func (self *Vlrouter) RemoveUplink(uplinkName string) error {
 	return nil
 }
 

@@ -805,15 +805,15 @@ func (self *OfnetAgent) RemoveNetwork(vlanId uint16, vni uint32, Gw string, Vrf 
 }
 
 // AddUplink adds an uplink to the switch
-func (self *OfnetAgent) AddUplink(portNo uint32, ifname string) error {
+func (self *OfnetAgent) AddUplink(uplinkInfo PortInfo) error {
 	// Call the datapath
-	return self.datapath.AddUplink(portNo, ifname)
+	return self.datapath.AddUplink(uplinkInfo)
 }
 
 // RemoveUplink remove an uplink to the switch
-func (self *OfnetAgent) RemoveUplink(portNo uint32) error {
+func (self *OfnetAgent) RemoveUplink(uplinkName string) error {
 	// Call the datapath
-	return self.datapath.RemoveUplink(portNo)
+	return self.datapath.RemoveUplink(uplinkName)
 }
 
 // AddSvcSpec adds a service spec to proxy

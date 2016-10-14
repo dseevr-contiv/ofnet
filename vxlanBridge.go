@@ -752,12 +752,12 @@ func (self *Vxlan) RemoveEndpoint(endpoint *OfnetEndpoint) error {
 }
 
 // AddUplink adds an uplink to the switch
-func (vx *Vxlan) AddUplink(portNo uint32, ifname string) error {
+func (vx *Vxlan) AddUplink(uplinkInfo PortInfo) error {
 	return nil
 }
 
 // RemoveUplink remove an uplink to the switch
-func (vx *Vxlan) RemoveUplink(portNo uint32) error {
+func (vx *Vxlan) RemoveUplink(uplinkName string) error {
 	return nil
 }
 
